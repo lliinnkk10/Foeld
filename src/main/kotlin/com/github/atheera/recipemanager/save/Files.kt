@@ -2,13 +2,14 @@ package com.github.atheera.recipemanager.save
 
 import com.github.atheera.recipemanager.listPath
 import com.github.atheera.recipemanager.path
+import com.github.atheera.recipemanager.recipeFavPath
 import com.github.atheera.recipemanager.recipePath
 import java.io.File
 
 class Files {
 
     // Misc
-    private fun makeDir(dirName: String) : File {
+    fun makeDir(dirName: String) : File {
         val dir = File(dirName)
         if(!dir.exists())
             dir.mkdirs()
@@ -50,6 +51,12 @@ class Files {
     fun getRecipeFile(cat: String, subCat: String, title: String) : File {
         val fileName = "$title.json"
         val dirName = makeRecipeDir(cat, subCat)
+        return File("$dirName/$fileName")
+    }
+
+    fun getRecipeFavorite(title: String) : File {
+        val fileName = "$title.json"
+        val dirName = makeDir(recipeFavPath)
         return File("$dirName/$fileName")
     }
 

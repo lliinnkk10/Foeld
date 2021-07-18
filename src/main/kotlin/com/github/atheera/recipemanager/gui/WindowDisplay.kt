@@ -41,10 +41,11 @@ private lateinit var jmiSavList: JMenuItem
         // Settings
 private lateinit var jmiSettings: JMenuItem
         // Recipes
-private lateinit var jmiDesRec: JMenu
+/*private lateinit var jmiDesRec: JMenu
 private lateinit var jmiExtraRec: JMenu
 private lateinit var jmiMeatRec: JMenu
-private lateinit var jmiSubCatRec: JMenuItem
+private lateinit var jmiSubCatRec: JMenuItem*/
+private lateinit var jmiSavRec: JMenuItem
 private lateinit var jmiNewRec: JMenuItem
 private lateinit var jmiFavRec: JMenuItem
 
@@ -198,19 +199,20 @@ class WindowDisplay : JFrame() {
         jmSubList = JMenu("Create new list"); jmLists.add(jmSubList)
         jmiToDoList = JMenuItem("Todo"); jmSubList.add(jmiToDoList); jmiToDoList.addActionListener{ switchPanels(States.NEWTODOLISTSTATE) }
         jmiPosNegList = JMenuItem("Positive/negative"); jmSubList.add(jmiPosNegList); jmiPosNegList.addActionListener { switchPanels(States.NEWPCLISTSTATE) }
-        jmiSavList = JMenuItem("View all lists"); jmLists.add(jmiSavList); jmiSavList.addActionListener{ switchPanels(States.SAVEDLISTSTATE) }
+        jmiSavList = JMenuItem("View all lists"); jmLists.add(jmiSavList); jmiSavList.addActionListener{ switchPanels(States.SAVEDLISTSTATE); SavListPane.loadLists() }
             // Settings
         jmiSettings = JMenuItem("Change save location"); jmSettings.add(jmiSettings); jmiSettings.addActionListener{ val csd = ChangeSaveDirectory(); csd.setLocationRelativeTo(this) }
         jmiSettings = JMenuItem("Go back to main menu"); jmSettings.add(jmiSettings); jmiSettings.addActionListener{ switchPanels(States.MENUSTATE) }
             // Recipes
         jmiNewRec = JMenuItem("Create new recipe"); jmRecipes.add(jmiNewRec); jmiNewRec.addActionListener{ switchPanels(States.NEWRECIPESTATE) }
-        jmiDesRec = JMenu("Desserts"); jmRecipes.add(jmiDesRec); jmiDesRec.addActionListener{  }
+        /*jmiDesRec = JMenu("Desserts"); jmRecipes.add(jmiDesRec); jmiDesRec.addActionListener{  }
         jmiExtraRec = JMenu("Extras"); jmRecipes.add(jmiExtraRec); jmiExtraRec.addActionListener{  }
-        jmiMeatRec = JMenu("Meats"); jmRecipes.add(jmiMeatRec); jmiMeatRec.addActionListener{  }
+        jmiMeatRec = JMenu("Meats"); jmRecipes.add(jmiMeatRec); jmiMeatRec.addActionListener{  }*/
+        jmiSavRec = JMenuItem("View all saved recipes"); jmRecipes.add(jmiSavRec); jmiSavRec.addActionListener { switchPanels(States.SAVEDRECIPESTATE) }
         jmiFavRec = JMenuItem("View all favorite recipes"); jmRecipes.add(jmiFavRec); jmiFavRec.addActionListener{ switchPanels(States.FAVORITERECIPESTATE) }
                 // Sub categories
                     // Desserts
-        jmiSubCatRec = JMenuItem(subCatDesserts[0]) ; jmiDesRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
+        /*jmiSubCatRec = JMenuItem(subCatDesserts[0]) ; jmiDesRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
         jmiSubCatRec = JMenuItem(subCatDesserts[1]) ; jmiDesRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
         jmiSubCatRec = JMenuItem(subCatDesserts[2]) ; jmiDesRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
         jmiSubCatRec = JMenuItem(subCatDesserts[3]) ; jmiDesRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
@@ -235,7 +237,7 @@ class WindowDisplay : JFrame() {
         jmiSubCatRec = JMenuItem(subCatMeats[2]) ; jmiMeatRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
         jmiSubCatRec = JMenuItem(subCatMeats[3]) ; jmiMeatRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
         jmiSubCatRec = JMenuItem(subCatMeats[4]) ; jmiMeatRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
-        jmiSubCatRec = JMenuItem(subCatMeats[5]) ; jmiMeatRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
+        jmiSubCatRec = JMenuItem(subCatMeats[5]) ; jmiMeatRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }*/
     }
 
     private fun changeTitle(panel: Int) : String {
@@ -254,12 +256,12 @@ class WindowDisplay : JFrame() {
     private fun changeSize(panel: Int) : Dimension {
         return when (panel) {
             States.MENUSTATE -> Dimension(backgroundImage.width, backgroundImage.height)
-            States.NEWRECIPESTATE -> Dimension(600, 600)
+            States.NEWRECIPESTATE -> Dimension(1025, 975)
             States.SAVEDRECIPESTATE -> Dimension(600, 600)
             States.FAVORITERECIPESTATE -> Dimension(600, 600)
             States.NEWPCLISTSTATE -> Dimension(800, 780)
             States.SAVEDLISTSTATE -> Dimension(400, 640)
-            States.NEWTODOLISTSTATE -> Dimension(600, 600)
+            States.NEWTODOLISTSTATE -> Dimension(400, 750)
             else -> Dimension(backgroundImage.width, backgroundImage.height)
         }
     }

@@ -3,7 +3,7 @@ package com.github.atheera.recipemanager.gui.panels.list
 import com.github.atheera.recipemanager.extras.HintTextField
 import com.github.atheera.recipemanager.listCategories
 import com.github.atheera.recipemanager.listPath
-import com.github.atheera.recipemanager.save.WriteListPC
+import com.github.atheera.recipemanager.save.write.WriteListPC
 import net.miginfocom.swing.MigLayout
 import java.awt.Color
 import java.awt.Dimension

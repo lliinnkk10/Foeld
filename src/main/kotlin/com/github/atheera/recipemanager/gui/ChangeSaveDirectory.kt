@@ -3,7 +3,7 @@ package com.github.atheera.recipemanager.gui
 import com.github.atheera.recipemanager.extras.HintTextField
 import com.github.atheera.recipemanager.onStartUp
 import com.github.atheera.recipemanager.save.Files
-import com.github.atheera.recipemanager.save.WriteSettingsFile
+import com.github.atheera.recipemanager.save.write.WriteSettingsFile
 import net.miginfocom.swing.MigLayout
 import java.util.Timer
 import javax.swing.*

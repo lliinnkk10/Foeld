@@ -3,8 +3,8 @@ package com.github.atheera.recipemanager
 import com.github.atheera.recipemanager.extras.LoadImage
 import com.github.atheera.recipemanager.gui.WindowDisplay
 import com.github.atheera.recipemanager.save.Files
-import com.github.atheera.recipemanager.save.ReadSettings
-import com.github.atheera.recipemanager.save.WriteSettingsFile
+import com.github.atheera.recipemanager.save.read.ReadSettings
+import com.github.atheera.recipemanager.save.write.WriteSettingsFile
 import java.io.File
 import java.lang.StringBuilder
 
@@ -14,6 +14,7 @@ val subCatDesserts = listOf("Cake", "Chocolate", "Confection", "Cookie", "Custar
 val subCatExtras = listOf("Bread", "Greenthing", "Sauce", "Savory Pie", "Soup")
 val subCatMeats = listOf("Beef", "Fish", "Other", "Plant Meat", "Poultry", "Pork")
 val listCategories = listOf("Pros and Cons", "To Do")
+val measures = listOf("L", "DL", "CL", "ML", "KG", "HG", "G", "MG", "TBSP", "TSP", "SPM", "PCS", "PINCH", "CUP")
 
 // List types items
     // Pros/Cons
@@ -23,6 +24,19 @@ lateinit var listPCNeg: MutableList<String>
     // To Do
 lateinit var listTDTitle: String
 lateinit var listTD: MutableList<String>
+    // Recipes
+lateinit var recipeTitle: String
+lateinit var recipeCategory: String
+lateinit var recipeSubCategory: String
+lateinit var recipeInstructions: String
+lateinit var recipeIngredients: MutableList<String>
+var recipeTemperature: Int = 0
+var recipeConvTemperature: Int = 0
+var recipeEgg: Boolean = false
+var recipeGluten: Boolean = false
+var recipeLactose: Boolean = false
+var recipeVegan: Boolean = false
+var recipeVegetarian: Boolean = false
 
 // Paths for saving location
 const val setPath: String = "C://FOE/"
@@ -30,20 +44,20 @@ const val settingsPath: String = "${setPath}Settings.json"
 lateinit var path: String
 lateinit var recipePath: String
 lateinit var listPath: String
+lateinit var recipeFavPath: String
 
 // Loading all images for use across the code
 val backgroundImage = LoadImage().loadImage("notepadBG.png")!!
-val imageIcon = LoadImage().loadImage(("imageIcon.png"))!!
+val imageIcon = LoadImage().loadImage(("icon.png"))!!
+val logo = LoadImage().loadImage("logo.png")!!
+val toolTip = LoadImage().loadImage("hoverTooltip.png")!!
 
 fun main() {
     // This should always run first!
     onStartUp()
 
-    //ReadListPC("LOL.json")
-
-    // Opens the program
+    // Opens the screen
     WindowDisplay()
-
 }
 
 fun onStartUp() {
@@ -57,6 +71,7 @@ fun onStartUp() {
     // Sets the save paths according to the Settings.json
     recipePath = "$path/Recipes/"
     listPath = "$path/Files/"
+    recipeFavPath = recipePath + "Favorites/"
 
     createDirs()
 }
@@ -77,7 +92,7 @@ fun createDirs() {
             listCategories[1] -> dir.makeListDir(lists)
         }
     }
-
+    dir.makeDir(recipeFavPath)
 }
 
 fun removeFirstAndLast(string: String) : String {

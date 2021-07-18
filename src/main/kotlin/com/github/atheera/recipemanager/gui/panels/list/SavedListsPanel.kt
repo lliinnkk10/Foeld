@@ -1,17 +1,16 @@
 package com.github.atheera.recipemanager.gui.panels.list
 
+import com.github.atheera.recipemanager.*
 import com.github.atheera.recipemanager.gui.frames.list.SavedPCList
-import com.github.atheera.recipemanager.listCategories
-import com.github.atheera.recipemanager.listPCNeg
-import com.github.atheera.recipemanager.listPCPos
-import com.github.atheera.recipemanager.listPCTitle
 import com.github.atheera.recipemanager.save.Files
-import com.github.atheera.recipemanager.save.ReadListPC
+import com.github.atheera.recipemanager.save.read.ReadListPC
+import com.github.atheera.recipemanager.save.read.ReadListTD
 import net.miginfocom.swing.MigLayout
 import java.awt.CardLayout
 import java.awt.Dimension
 import java.awt.event.ItemEvent
 import java.io.File
+import java.io.IOException
 import javax.swing.*
 import javax.swing.border.EtchedBorder
 import javax.swing.border.TitledBorder
@@ -63,6 +62,22 @@ class SavedListsPanel : JPanel() {
             }
         }
 
+        // Add to screen
+        add(contentPane)
+        contentPane.add(jcbTypes, "align center, wrap")
+
+        panTypes.add(jspCardPC, listCategories[0])
+        panTypes.add(jspCardTD, listCategories[1])
+        contentPane.add(panTypes, "align center")
+    }
+
+    fun loadLists() {
+        try {
+            panCardPC.removeAll()
+            panCardTD.removeAll()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
         for(type in listCategories) { // Loop through all list types
             val file = File(Files().makeListDir(type))
             val files = file.listFiles()
@@ -88,6 +103,9 @@ class SavedListsPanel : JPanel() {
                     listCategories[1] -> { // To Do List
                         tempButton = JButton(name)
                         tempButton.addActionListener {
+                            ReadListTD(names)
+                            val title: String = listTDTitle
+                            val list: MutableList<String> = listTD
 
                         }
                         panCardTD.add(tempButton, "align center, wrap")
@@ -96,13 +114,6 @@ class SavedListsPanel : JPanel() {
 
             }
         }
-
-        // Add to screen
-        add(contentPane)
-        contentPane.add(jcbTypes, "align center, wrap")
-
-        panTypes.add(jspCardPC, listCategories[0])
-        panTypes.add(jspCardTD, listCategories[1])
-        contentPane.add(panTypes, "align center")
     }
+
 }
