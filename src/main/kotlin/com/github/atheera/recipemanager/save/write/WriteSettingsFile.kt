@@ -1,5 +1,6 @@
 package com.github.atheera.recipemanager.save.write
 
+import com.github.atheera.recipemanager.dw
 import com.github.atheera.recipemanager.save.objects.Settings
 import com.github.atheera.recipemanager.save.read.ReadSettings
 import com.github.atheera.recipemanager.settingsPath
@@ -26,6 +27,7 @@ class WriteSettingsFile(saveLocation: String) {
         try{
             FileWriter(file.absoluteFile).use { writer -> gson.toJson(sett, writer) }
         } catch (e: IOException) {
+            dw.exc(e)
             e.printStackTrace()
         }
 

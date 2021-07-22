@@ -2,7 +2,8 @@ package com.github.atheera.recipemanager.gui.panels.recipe
 
 import com.github.atheera.recipemanager.*
 import com.github.atheera.recipemanager.extras.HintTextField
-import com.github.atheera.recipemanager.extras.ToolTipButton
+import com.github.atheera.recipemanager.extras.TextLineNumber
+import com.github.atheera.recipemanager.extras.ToolTipLabel
 import com.github.atheera.recipemanager.save.write.WriteRecipeFavorite
 import com.github.atheera.recipemanager.save.write.WriteRecipeSaves
 import net.miginfocom.swing.MigLayout
@@ -19,107 +20,139 @@ import javax.swing.border.Border
 import javax.swing.border.EtchedBorder
 import javax.swing.border.TitledBorder
 
-// Local
-val ml = MigLayout()
-private val fontA = Font("Tahoma", Font.BOLD, 20)
-private val fontB = Font("Tahoma", Font.PLAIN, 16)
-val jpInsIng = JPanel(MigLayout())
+class NewRecipePanel(new: Boolean) : JPanel(MigLayout()), ItemListener, ActionListener {
 
-// Title
-var htfTitle = HintTextField("Start with naming the recipe here")
+    // Local
+    private val ml = MigLayout()
+    private val fontA = Font("Tahoma", Font.BOLD, 20)
+    private val fontB = Font("Tahoma", Font.PLAIN, 16)
+    private val jpInsIng = JPanel(MigLayout())
+    private val jpRecipe = JPanel(MigLayout())
+    private val jspRecipe = JScrollPane(jpRecipe)
 
-// Categories
-var jpCats = JPanel(ml)
-lateinit var jcbCategories: JComboBox<String>
-var cl = CardLayout()
-val jpCatCards = JPanel(cl)
-val jpSubCatD = JPanel()
-val jpSubCatE = JPanel()
-val jpSubCatM = JPanel()
-var bgJRBGroup = ButtonGroup()
-lateinit var selCategory: String
-lateinit var selSubCat: String
-lateinit var jrbSel: JRadioButton
-lateinit var bmCat: ButtonModel
+    // Title
+    var htfTitle = HintTextField("Start with naming the recipe here")
 
-// Intolerance checkboxes
-val jcbEgg = JCheckBox("Egg Free")
-val jcbGluten = JCheckBox("Gluten Free")
-val jcbLactose = JCheckBox("Lactose Free")
-val jcbVegan = JCheckBox("Vegan")
-val jcbVeget = JCheckBox("Vegetarian")
-val jpIntol = JPanel(MigLayout())
+    // Categories
+    var jpCats = JPanel(ml)
+    lateinit var jcbCategories: JComboBox<String>
+    var cl = CardLayout()
+    private val jpCatCards = JPanel(cl)
+    private val jpSubCatD = JPanel()
+    private val jpSubCatE = JPanel()
+    private val jpSubCatM = JPanel()
+    var bgJRBGroup = ButtonGroup()
+    lateinit var selCategory: String
+    lateinit var selSubCat: String
+    lateinit var jrbSel: JRadioButton
+    lateinit var bmCat: ButtonModel
+    var jlCat = JLabel()
+    var jlSubCat = JLabel()
 
-// Degree converter
-var factor: Int = 0
-var result: Int = 0
-val jpDegrees = JPanel(MigLayout())
-val jpConv = JPanel(MigLayout())
-var htfDegrees = HintTextField("0")
-val jlConverted = JLabel("0")
-val jlCF = JLabel("")
-val jrbCFahr = JRadioButton("Convert to Fahrenheit")
-val jrbCCEls = JRadioButton("Convert to Celsius")
-val bgCF = ButtonGroup()
+    // Intolerance checkboxes
+    val jcbEgg = JCheckBox("Egg Free")
+    val jcbGluten = JCheckBox("Gluten Free")
+    val jcbLactose = JCheckBox("Lactose Free")
+    val jcbVegan = JCheckBox("Vegan")
+    val jcbVeget = JCheckBox("Vegetarian")
+    private val jpIntol = JPanel(MigLayout())
 
-// Ingredients list
-val jpIng = JPanel(MigLayout())
-val jpIngOut = JPanel(MigLayout())
-val jspIng = JScrollPane(jpIng)
-val jbIngAdd = JButton("Add to list")
-var htfIngAmount = HintTextField("Amount")
-var jcbIngMeasure = JComboBox(measures.toTypedArray())
-var htfIngItem = HintTextField("Item")
-var alIngredients = mutableListOf<String>()
-var counterIng: Int = 0
-lateinit var selectedMeasure: String
-val ttbIng = ToolTipButton("You can also press enter when typing the item to add!")
+    // Degree converter
+    var factor: Int = 0
+    var result: Int = 0
+    private val jpDegrees = JPanel(MigLayout())
+    private val jpConv = JPanel(MigLayout())
+    var htfDegrees = HintTextField("0")
+    val jlConverted = JLabel("0")
+    val jlCF = JLabel("")
+    val jrbCFahr = JRadioButton("Convert to Fahrenheit")
+    val jrbCCEls = JRadioButton("Convert to Celsius")
+    private val bgCF = ButtonGroup()
 
-// Instructions list
-val jpIns = JPanel(MigLayout())
-val jpInsOut = JPanel(MigLayout())
-val jspIns = JScrollPane(jpIns)
-val jtaIns = JTextArea()
+    // Ingredients list
+    val jpIng = JPanel(MigLayout())
+    private val jpIngOut = JPanel(MigLayout())
+    private val jspIng = JScrollPane(jpIng)
+    private val jbIngAdd = JButton("Add to list")
+    var htfIngAmount = HintTextField("Amount")
+    var jcbIngMeasure = JComboBox(measures.toTypedArray())
+    var htfIngItem = HintTextField("Item")
+    var alIngredients = mutableListOf<String>()
 
-// Save buttons
-val jbSave = JButton()
-val jbFavorite = JButton()
-val jpButtons = JPanel(MigLayout())
+    var counterIng: Int = 0
+    lateinit var selectedMeasure: String
+    private val ttlIng = ToolTipLabel("You can also press enter when typing the item to add!")
 
-class NewRecipePanel : JPanel(MigLayout()), ItemListener, ActionListener {
+
+    // Instructions list
+    private val jpIns = JPanel(MigLayout())
+    private val jpInsOut = JPanel(MigLayout())
+    private val jspIns = JScrollPane(jpIns)
+    val jtaIns = JTextArea()
+    private val tlnIns = TextLineNumber(jtaIns)
+
+    // Description list
+    private val jpDesc = JPanel(MigLayout())
+    val jtaDesc = JTextArea()
+
+    // Save buttons
+    val jbSave = JButton()
+    val jbFavorite = JButton()
+    private val jpButtons = JPanel(MigLayout())
 
     init {
         border = setBorder("Here you can create a new recipe!")
 
         // Functions
         htfTitle.minimumSize = Dimension(250, 25)
-        addJCBList()
+        addJCBList(new)
         addCheckBoxes()
         addDegreeConverter()
         addIngredientList()
         addInstructionList()
+        addDescriptionList()
         addSaveButtons()
+        jspRecipe.verticalScrollBar.unitIncrement = 16
+        jspRecipe.verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS
+        //jspRecipe.minimumSize = Dimension(1025, 975)
+        //jpRecipe.minimumSize = Dimension(1025, 975)
 
         // Add
-        add(htfTitle, "align center, wrap")
-        add(jpCats, "align center, wrap")
-        add(jpIntol, "align center, split 2")
-        add(jpDegrees, "align center, wrap")
-        add(jpInsIng, "align center, wrap")
-        add(jpButtons, "align center")
+
+        jpRecipe.add(htfTitle, "align center, wrap")
+        jpRecipe.add(jpCats, "align center, wrap")
+        jpRecipe.add(jpIntol, "align center, wrap")
+        jpRecipe.add(jpDegrees, "align center, wrap")
+        jpRecipe.add(jpInsIng, "align center, wrap")
+        jpRecipe.add(jpDesc, "align center, wrap")
+        jpRecipe.add(jpButtons, "align center")
+        add(jspRecipe)
+    }
+
+    fun addDescriptionList() {
+        jpDesc.border = setBorder("Enter a short description of the recipe")
+
+        jtaDesc.wrapStyleWord = false
+        jtaDesc.lineWrap = false
+        jtaDesc.minimumSize = Dimension(300, 25)
+        jtaDesc.maximumSize = Dimension(300, 25)
+        jtaDesc.font = fontB
+
+        jpDesc.add(jtaDesc)
     }
 
     fun addSaveButtons() {
-        updateButtons()
+        updateButtons(true)
 
         jbSave.addActionListener {
-            if(getInformation()) {
+            if(getInformation(true)) {
                 WriteRecipeSaves(
                     recipeTitle,
                     recipeCategory,
                     recipeSubCategory,
                     recipeInstructions,
                     recipeIngredients,
+                    recipeDescription,
                     recipeTemperature,
                     recipeConvTemperature,
                     recipeEgg,
@@ -134,13 +167,14 @@ class NewRecipePanel : JPanel(MigLayout()), ItemListener, ActionListener {
         }
 
         jbFavorite.addActionListener {
-            if(getInformation()) {
+            if(getInformation(true)) {
                 WriteRecipeFavorite(
                     recipeTitle,
                     recipeCategory,
                     recipeSubCategory,
                     recipeInstructions,
                     recipeIngredients,
+                    recipeDescription,
                     recipeTemperature,
                     recipeConvTemperature,
                     recipeEgg,
@@ -169,6 +203,7 @@ class NewRecipePanel : JPanel(MigLayout()), ItemListener, ActionListener {
 
         jspIns.minimumSize = Dimension(475, 522)
         jspIns.maximumSize = Dimension(475, 522)
+        jspIns.setRowHeaderView(tlnIns)
         jspIns.verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS
         jspIns.verticalScrollBar.unitIncrement = 16
 
@@ -198,6 +233,7 @@ class NewRecipePanel : JPanel(MigLayout()), ItemListener, ActionListener {
                     val ingCard = createCard()
                     jpIng.add(ingCard, "wrap")
                 } catch (e: NumberFormatException) {
+                    dw.exc(e)
                     e.printStackTrace()
                     JOptionPane.showMessageDialog(this, "You need to enter some valid information first, numbers only!")
                 }
@@ -211,6 +247,7 @@ class NewRecipePanel : JPanel(MigLayout()), ItemListener, ActionListener {
                     jpIng.add(ingCard, "wrap")
                     htfIngAmount.requestFocus()
                 } catch (e: NumberFormatException) {
+                    dw.exc(e)
                     e.printStackTrace()
                     JOptionPane.showMessageDialog(this, "You need to enter some valid information first, numbers only!")
                 }
@@ -218,7 +255,7 @@ class NewRecipePanel : JPanel(MigLayout()), ItemListener, ActionListener {
         }
 
         jpIngOut.add(jbIngAdd, "align center, split 2")
-        jpIngOut.add(ttbIng, "wrap")
+        jpIngOut.add(ttlIng, "wrap")
         jpIngOut.add(htfIngAmount, "align center, split 3")
         jpIngOut.add(jcbIngMeasure)
         jpIngOut.add(htfIngItem, "wrap")
@@ -242,6 +279,7 @@ class NewRecipePanel : JPanel(MigLayout()), ItemListener, ActionListener {
                 jlCF.text = "° C"
                 updateUI()
             } catch(e: NumberFormatException) {
+                dw.exc(e)
                 JOptionPane.showMessageDialog(this, "That is not a whole number! Try again!")
             }
         }
@@ -254,6 +292,7 @@ class NewRecipePanel : JPanel(MigLayout()), ItemListener, ActionListener {
                 jlCF.text = "° F"
                 updateUI()
             } catch(e: NumberFormatException) {
+                dw.exc(e)
                 JOptionPane.showMessageDialog(this, "That is not a whole number! Try again!")
             }
 
@@ -279,45 +318,53 @@ class NewRecipePanel : JPanel(MigLayout()), ItemListener, ActionListener {
         jpIntol.add(jcbVeget)
     }
 
-    private fun addJCBList() {
-
+    private fun addJCBList(new: Boolean) {
         jcbCategories = JComboBox(categories.toTypedArray())
         jcbCategories.isEditable = false
         jcbCategories.addItemListener(this)
         jcbCategories.selectedIndex = 0
         selCategory = categories[0]
 
-        for(i in subCatDesserts.indices) {
+        for (i in subCatDesserts.indices) {
             val jrb = JRadioButton(subCatDesserts[i])
             jpSubCatD.add(jrb)
             bgJRBGroup.add(jrb)
             jrb.actionCommand = i.toString()
             jrb.addActionListener(this)
-            if(i == 0)
+            if (i == 0)
                 jrb.doClick()
         }
-        for(i in subCatExtras.indices) {
+        for (i in subCatExtras.indices) {
             val jrb = JRadioButton(subCatExtras[i])
             jpSubCatE.add(jrb)
             bgJRBGroup.add(jrb)
             jrb.actionCommand = i.toString()
             jrb.addActionListener(this)
         }
-        for(i in subCatMeats.indices) {
+        for (i in subCatMeats.indices) {
             val jrb = JRadioButton(subCatMeats[i])
             jpSubCatM.add(jrb)
             bgJRBGroup.add(jrb)
             jrb.actionCommand = i.toString()
             jrb.addActionListener(this)
         }
-        bmCat = bgJRBGroup.selection
-        bgJRBGroup.setSelected(bmCat, true)
-        jpCatCards.add(jpSubCatD, categories[0])
-        jpCatCards.add(jpSubCatE, categories[1])
-        jpCatCards.add(jpSubCatM, categories[2])
-        jpCats.add(jcbCategories, "align center, wrap")
-        jpCats.add(jpCatCards, "wrap")
-        jpCats.border = setBorder("Select the category in the drop box, and what kind of food with the buttons")
+        if(new) {
+            bmCat = bgJRBGroup.selection
+            bgJRBGroup.setSelected(bmCat, true)
+            jpCatCards.add(jpSubCatD, categories[0])
+            jpCatCards.add(jpSubCatE, categories[1])
+            jpCatCards.add(jpSubCatM, categories[2])
+            jpCats.add(jcbCategories, "align center, wrap")
+            jpCats.add(jpCatCards, "wrap")
+            jpCats.border = setBorder("Select the category in the drop box, and what kind of food with the buttons")
+        } else {
+            jpCats.border = setBorder("The saved recipe is saved in")
+            jlCat.font = fontA
+            jlSubCat.font = fontB
+            jpCats.add(jlCat, "align center, wrap")
+            jpCats.add(jlSubCat, "align center")
+            jpCats.minimumSize = Dimension(250, 75)
+        }
     }
 
     fun createCard(amount: Double = htfIngAmount.text.toDouble(), measure: String = selectedMeasure, item: String = htfIngItem.text, removePane: JPanel = jpIng) : JPanel {
@@ -359,11 +406,12 @@ class NewRecipePanel : JPanel(MigLayout()), ItemListener, ActionListener {
         return jp
     }
 
-    fun getInformation() : Boolean {
+    fun getInformation(new: Boolean) : Boolean {
         val c1: Boolean
         val c2: Boolean
         val c3: Boolean
-        var c4 = false
+        val c4: Boolean
+        var c5 = false
         if((htfTitle.text.isEmpty() || htfTitle.text == "Start with naming the recipe here")) {
             JOptionPane.showMessageDialog(this, "The recipe needs a title first!")
             return false
@@ -376,12 +424,15 @@ class NewRecipePanel : JPanel(MigLayout()), ItemListener, ActionListener {
             JOptionPane.showMessageDialog(this, "You should add some instructions!")
             return false
         } else { c3 = true }
-        if(c1 && c2 && c3) {
+        if(jtaDesc.text.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Enter a short description first!")
+            return false
+        } else { c4 = true }
+        if(c1 && c2 && c3 && c4) {
             recipeTitle = htfTitle.text
-            recipeCategory = selCategory
-            recipeSubCategory = selSubCat
             recipeIngredients = alIngredients
             recipeInstructions = jtaIns.text
+            recipeDescription = jtaDesc.text
             recipeTemperature = factor
             recipeConvTemperature = result
             recipeEgg = jcbEgg.isSelected
@@ -389,9 +440,16 @@ class NewRecipePanel : JPanel(MigLayout()), ItemListener, ActionListener {
             recipeLactose = jcbLactose.isSelected
             recipeVegan = jcbVegan.isSelected
             recipeVegetarian = jcbVeget.isSelected
-            c4 = true
+            c5 = true
+            if (!new) {
+                recipeCategory = jlCat.text
+                recipeSubCategory = jlSubCat.text
+            } else {
+                recipeCategory = selCategory
+                recipeSubCategory = selSubCat
+            }
         }
-        return c4
+        return c5
     }
 
     fun clearInformation() {
@@ -401,7 +459,9 @@ class NewRecipePanel : JPanel(MigLayout()), ItemListener, ActionListener {
         selSubCat = subCatDesserts[0]
         alIngredients.clear()
         jpIng.removeAll()
+        counterIng = 0
         jtaIns.text = ""
+        jtaDesc.text = ""
         factor = 0
         htfDegrees.text = "0"
         result = 0
@@ -432,15 +492,18 @@ class NewRecipePanel : JPanel(MigLayout()), ItemListener, ActionListener {
         return true
     }
 
-    private fun updateButtons() {
-        updateUI()
-        jbSave.text = "Click me to save the recipe to: $recipePath$selCategory/$selSubCat"
-        jbFavorite.text = recipePath+"Favorites"
-        updateUI()
-    }
-
-    private fun setBorder(title: String) : Border {
-        return TitledBorder(EtchedBorder(), title)
+    fun updateButtons(new: Boolean) {
+        if (new) {
+            updateUI()
+            jbSave.text = "Click me to save the recipe to: $recipePath$selCategory/$selSubCat"
+            jbFavorite.text = recipePath + "Favorites"
+            updateUI()
+        } else {
+            updateUI()
+            jbSave.text = "Click me to save the recipe to: $recipePath${jlCat.text}/${jlSubCat.text}"
+            jbFavorite.text = recipePath + "Favorites"
+            updateUI()
+        }
     }
 
     override fun itemStateChanged(e: ItemEvent) {
@@ -448,12 +511,12 @@ class NewRecipePanel : JPanel(MigLayout()), ItemListener, ActionListener {
         cl.show(jpCatCards, e.item as String)
         if(e.stateChange == ItemEvent.SELECTED)
             selCategory = e.item.toString()
-        updateButtons()
+        updateButtons(true)
     }
 
     override fun actionPerformed(e: ActionEvent) {
         jrbSel = e.source as JRadioButton
         selSubCat = jrbSel.text
-        updateButtons()
+        updateButtons(true)
     }
 }

@@ -1,14 +1,17 @@
 package com.github.atheera.recipemanager.gui.panels.list
 
+import com.github.atheera.recipemanager.dw
 import com.github.atheera.recipemanager.extras.HintTextField
 import com.github.atheera.recipemanager.listCategories
 import com.github.atheera.recipemanager.listPath
+import com.github.atheera.recipemanager.save.write.WriteListTD
 import net.miginfocom.swing.MigLayout
 import java.awt.Dimension
 import java.awt.Font
+import java.awt.Graphics
 import java.awt.event.ItemEvent
 import java.awt.font.TextAttribute
-import java.awt.font.TextAttribute.STRIKETHROUGH_ON
+import java.util.*
 import javax.swing.*
 import javax.swing.border.EtchedBorder
 import javax.swing.border.TitledBorder
@@ -27,9 +30,10 @@ class NewTodoListPanel : JPanel(MigLayout("align center")) {
 
     private var list = mutableListOf<String>()
     private var checkList = mutableListOf<JCheckBox>()
-    private var listCounter: Int = 0
-    private var fontA = Font("Tahoma", Font.BOLD, 20)
+    private val map = Hashtable<TextAttribute, Any?>()
+
     private val fontB = Font("Tahoma", Font.PLAIN, 20)
+    var fontS = fontB
     private val dim = Dimension(350, 500)
 
     init {
@@ -51,17 +55,27 @@ class NewTodoListPanel : JPanel(MigLayout("align center")) {
             addToList()
         }
         jbRemove.addActionListener {
-            println(checkList.iterator())
             println(list)
-            for(i in 0 until checkList.size) {
+            for(i in checkList.indices) {
                 jpList.remove(checkList[i])
-                checkList.removeAt(i)
-                list.removeAt(i)
+                list.remove(checkList[i].text)
             }
+            checkList.clear()
+            dw.add(list.toString())
             updateUI()
         }
         jbSave.addActionListener {
-            println(list)
+            if((htfTitle.text.isEmpty() || htfTitle.text == "Enter the list title here") || list.isEmpty())
+                JOptionPane.showMessageDialog(this, "You need to enter information to save first!")
+            else {
+                val checked = mutableListOf<String>()
+                for(i in checkList.indices) {
+                    checked.add(checkList[i].text)
+                }
+                WriteListTD(listCategories[1], htfTitle.text, list, checked)
+                JOptionPane.showMessageDialog(this, "Successfully saved list to: $listPath/${listCategories[1]}")
+                clearInfo()
+            }
         }
 
         add(htfTitle, "align center, wrap")
@@ -86,17 +100,17 @@ class NewTodoListPanel : JPanel(MigLayout("align center")) {
 
     fun createCard(item: String) : JCheckBox {
         val jcbChecked = JCheckBox(item)
-        jcbChecked.font = fontA
+        jcbChecked.font = fontB
 
         list.add(item)
 
         jcbChecked.addItemListener {
             if(it.stateChange == ItemEvent.SELECTED) {
                 checkList.add(jcbChecked)
-                jcbChecked.font = strikeThrough(fontA)
+                jcbChecked.font = fontS
             } else if ((it.stateChange == ItemEvent.DESELECTED)) {
                 checkList.remove(jcbChecked)
-                jcbChecked.font = fontA
+                jcbChecked.font = fontB
             }
         }
 
@@ -106,21 +120,19 @@ class NewTodoListPanel : JPanel(MigLayout("align center")) {
 
     private fun clearInfo() {
         htfItem.text = ""
+        htfTitle.text = ""
 
         jspList.removeAll()
 
-        checkList.removeAll(checkList)
+        list.clear()
+        checkList.clear()
         updateUI()
     }
 
-    private fun strikeThrough(font: Font): Font {
-        val attributes = font.attributes
-        attributes.set(TextAttribute.STRIKETHROUGH, STRIKETHROUGH_ON)
-        return Font(attributes)
+    override fun paint(g: Graphics?) {
+        super.paint(g)
+        map[TextAttribute.STRIKETHROUGH] = TextAttribute.STRIKETHROUGH_ON
+        fontS = fontB.deriveFont(map)
     }
-
-}
-
-private fun <K, V> Map<K, V>.set(key: V, value: V) {
 
 }

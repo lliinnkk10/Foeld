@@ -9,33 +9,36 @@ import java.io.FileReader
 import java.io.IOException
 import java.text.ParseException
 
-class ReadRecipe(fileName: String) {
+class ReadRecipe(cat: String, subCat: String, fileName: String) {
 
     private var parser = JsonParser()
     private var recipe = Recipe()
+    private val file = recipePath.plus("$cat/$subCat/$fileName")
 
     init {
-
         try {
-            val reader = FileReader(fileName)
-            println("File loaded at: $fileName")
+            val reader = FileReader(file)
+            println("File loaded at: $file")
+            dw.add("File loaded at: $file")
             val obj: JsonObject = parser.parse(reader) as JsonObject
             parseRecipeObject(obj)
             recipe.toFormat()
         } catch(e: ParseException) {
+            dw.exc(e)
             e.printStackTrace()
         } catch(e: FileNotFoundException) {
+            dw.exc(e)
             e.printStackTrace()
         } catch(e: IOException) {
+            dw.exc(e)
             e.printStackTrace()
         }
-
-
     }
 
     private fun parseRecipeObject(file: JsonObject) {
 
         recipeIngredients = mutableListOf()
+        recipe.ingredients = mutableListOf()
 
         val title = file.get("title").asString
         recipe.title = title
@@ -49,7 +52,7 @@ class ReadRecipe(fileName: String) {
         recipe.subCategory = subCategory
         recipeSubCategory = subCategory
 
-        val instruction = file.get("instruction").asString
+        val instruction = file.get("instructions").asString
         recipe.instructions = instruction
         recipeInstructions = instruction
 
@@ -58,6 +61,10 @@ class ReadRecipe(fileName: String) {
             recipe.ingredients.add(removeFirstAndLast(ingredients[i].toString()))
             recipeIngredients.add(removeFirstAndLast(ingredients[i].toString()))
         }
+
+        val description = file.get("description").asString
+        recipe.description = description
+        recipeDescription = description
 
         val temperature = file.get("temperature").asInt
         recipe.temperature = temperature

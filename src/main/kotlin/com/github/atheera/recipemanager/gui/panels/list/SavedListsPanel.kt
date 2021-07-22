@@ -1,7 +1,9 @@
 package com.github.atheera.recipemanager.gui.panels.list
 
 import com.github.atheera.recipemanager.*
+import com.github.atheera.recipemanager.extras.ButtonListCard
 import com.github.atheera.recipemanager.gui.frames.list.SavedPCList
+import com.github.atheera.recipemanager.gui.frames.list.SavedTDList
 import com.github.atheera.recipemanager.save.Files
 import com.github.atheera.recipemanager.save.read.ReadListPC
 import com.github.atheera.recipemanager.save.read.ReadListTD
@@ -71,11 +73,41 @@ class SavedListsPanel : JPanel() {
         contentPane.add(panTypes, "align center")
     }
 
+    private fun createButton(title: String, type: String, file: String) : ButtonListCard {
+        val jb = ButtonListCard(title, type)
+
+        when(type) {
+            listCategories[0] -> {
+                jb.addActionListener {
+                    ReadListPC(file)
+                    val titled = listPCTitle
+                    val posList = listPCPos
+                    val negList = listPCNeg
+                    val spcl = SavedPCList(titled, posList, negList)
+                    spcl.setLocationRelativeTo(this)
+                }
+            }
+            listCategories[1] -> {
+                jb.addActionListener {
+                    ReadListTD(file)
+                    val titled = listTDTitle
+                    val todolist = listTD
+                    val checked = listTDChecked
+                    val stdl = SavedTDList(titled, todolist, checked)
+                    stdl.setLocationRelativeTo(this)
+                }
+            }
+        }
+
+        return jb
+    }
+
     fun loadLists() {
         try {
             panCardPC.removeAll()
             panCardTD.removeAll()
         } catch (e: IOException) {
+            dw.exc(e)
             e.printStackTrace()
         }
         for(type in listCategories) { // Loop through all list types
@@ -89,25 +121,11 @@ class SavedListsPanel : JPanel() {
 
                 when (type) { // Adds buttons and function to each list type
                     listCategories[0] -> { // Pros/Cons
-                        tempButton = JButton(name)
-                        tempButton.addActionListener {
-                            ReadListPC(names)
-                            val title: String = listPCTitle
-                            val posList: MutableList<String> = listPCPos
-                            val negList: MutableList<String> = listPCNeg
-                            val spcl = SavedPCList(title, posList, negList)
-                            spcl.setLocationRelativeTo(this)
-                        }
+                        tempButton = createButton(name, listCategories[0], names)
                         panCardPC.add(tempButton, "align center, wrap")
                     }
                     listCategories[1] -> { // To Do List
-                        tempButton = JButton(name)
-                        tempButton.addActionListener {
-                            ReadListTD(names)
-                            val title: String = listTDTitle
-                            val list: MutableList<String> = listTD
-
-                        }
+                        tempButton = createButton(name, listCategories[1], names)
                         panCardTD.add(tempButton, "align center, wrap")
                     }
                 }

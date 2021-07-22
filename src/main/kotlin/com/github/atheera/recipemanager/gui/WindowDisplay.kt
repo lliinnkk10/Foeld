@@ -5,9 +5,7 @@ import com.github.atheera.recipemanager.gui.panels.MenuPanel
 import com.github.atheera.recipemanager.gui.panels.list.NewPCListPanel
 import com.github.atheera.recipemanager.gui.panels.list.NewTodoListPanel
 import com.github.atheera.recipemanager.gui.panels.list.SavedListsPanel
-import com.github.atheera.recipemanager.gui.panels.recipe.FavoriteRecipePanel
-import com.github.atheera.recipemanager.gui.panels.recipe.NewRecipePanel
-import com.github.atheera.recipemanager.gui.panels.recipe.SavedRecipePanel
+import com.github.atheera.recipemanager.gui.panels.recipe.*
 import java.awt.BorderLayout
 import java.awt.CardLayout
 import java.awt.Dimension
@@ -19,6 +17,9 @@ private lateinit var MenuPane: MenuPanel
     // Recipes
 private lateinit var NewRecPane: NewRecipePanel
 private lateinit var SavRecPane: SavedRecipePanel
+private lateinit var SavDesRecPan: SavedDessertRecipePanel
+private lateinit var SavExtRecPan: SavedExtraRecipePanel
+private lateinit var SavMeaRecPan: SavedMeatRecipePanel
 private lateinit var FavRecPane: FavoriteRecipePanel
     // Lists
 private lateinit var NewPosNegListPane: NewPCListPanel
@@ -40,12 +41,12 @@ private lateinit var jmiToDoList: JMenuItem
 private lateinit var jmiSavList: JMenuItem
         // Settings
 private lateinit var jmiSettings: JMenuItem
+private lateinit var jmiDebug: JMenuItem
         // Recipes
-/*private lateinit var jmiDesRec: JMenu
-private lateinit var jmiExtraRec: JMenu
-private lateinit var jmiMeatRec: JMenu
-private lateinit var jmiSubCatRec: JMenuItem*/
-private lateinit var jmiSavRec: JMenuItem
+private lateinit var jmiDesRec: JMenuItem
+private lateinit var jmiExtraRec: JMenuItem
+private lateinit var jmiMeatRec: JMenuItem
+private lateinit var jmiSavRec: JMenu
 private lateinit var jmiNewRec: JMenuItem
 private lateinit var jmiFavRec: JMenuItem
 
@@ -58,6 +59,9 @@ object States {
     const val NEWPCLISTSTATE: Int = 4
     const val NEWTODOLISTSTATE: Int = 5
     const val SAVEDLISTSTATE: Int = 6
+    const val SAVEDDESSERTRECIPESTATE: Int = 7
+    const val SAVEDEXTRARECIPESTATE: Int = 8
+    const val SAVEDMEATRECIPESTATE: Int = 9
 }
 var currentState: Int = States.MENUSTATE
 private val panels = listOf(
@@ -67,7 +71,10 @@ private val panels = listOf(
     "Favorite Recipe",
     "New PC List",
     "New TODO List",
-    "Saved List"
+    "Saved List",
+    "Saved Desserts",
+    "Saved Extras",
+    "Saved Meats"
 )
 
 // Misc
@@ -83,8 +90,11 @@ class WindowDisplay : JFrame() {
         mainPane = JPanel(cl)
         MenuPane = MenuPanel()
 
-        NewRecPane = NewRecipePanel()
+        NewRecPane = NewRecipePanel(true)
         SavRecPane = SavedRecipePanel()
+        SavDesRecPan = SavedDessertRecipePanel()
+        SavExtRecPan = SavedExtraRecipePanel()
+        SavMeaRecPan = SavedMeatRecipePanel()
         FavRecPane = FavoriteRecipePanel()
 
         NewPosNegListPane = NewPCListPanel()
@@ -103,6 +113,9 @@ class WindowDisplay : JFrame() {
         mainPane.add(NewPosNegListPane, panels[4])
         mainPane.add(NewToDoListPane, panels[5])
         mainPane.add(SavListPane, panels[6])
+        mainPane.add(SavDesRecPan, panels[7])
+        mainPane.add(SavExtRecPan, panels[8])
+        mainPane.add(SavMeaRecPan, panels[9])
         add(mainPane, BorderLayout.CENTER)
             // Menu buttons to menu panel
         jmb.add(jmSettings)
@@ -128,61 +141,33 @@ class WindowDisplay : JFrame() {
             States.NEWPCLISTSTATE -> States.NEWPCLISTSTATE
             States.NEWTODOLISTSTATE -> States.NEWTODOLISTSTATE
             States.SAVEDLISTSTATE -> States.SAVEDLISTSTATE
+            States.SAVEDDESSERTRECIPESTATE -> States.SAVEDDESSERTRECIPESTATE
+            States.SAVEDEXTRARECIPESTATE -> States.SAVEDEXTRARECIPESTATE
+            States.SAVEDMEATRECIPESTATE -> States.SAVEDMEATRECIPESTATE
             else -> States.MENUSTATE
         }
     }
 
+    private fun setPanelInfo(panel: JPanel, state: Int) {
+        showPanel(panel, state)
+        size = changeSize(state)
+        title = changeTitle(state)
+        setCurrentState(state)
+        setLocationRelativeTo(null)
+    }
+
     private fun switchPanels(panel: Int) {
         when (panel) {
-            States.MENUSTATE -> {
-                showPanel(MenuPane, States.MENUSTATE)
-                size = changeSize(States.MENUSTATE)
-                title = changeTitle(States.MENUSTATE)
-                setCurrentState(States.MENUSTATE)
-                setLocationRelativeTo(null)
-            }
-            States.NEWRECIPESTATE -> {
-                showPanel(NewRecPane, States.NEWRECIPESTATE)
-                size = changeSize(States.NEWRECIPESTATE)
-                title = changeTitle(States.NEWRECIPESTATE)
-                setCurrentState(States.NEWRECIPESTATE)
-                setLocationRelativeTo(null)
-            }
-            States.SAVEDRECIPESTATE -> {
-                showPanel(SavRecPane, States.SAVEDRECIPESTATE)
-                size = changeSize(States.SAVEDRECIPESTATE)
-                title = changeTitle(States.SAVEDRECIPESTATE)
-                setCurrentState(States.SAVEDRECIPESTATE)
-                setLocationRelativeTo(null)
-            }
-            States.FAVORITERECIPESTATE -> {
-                showPanel(FavRecPane, States.FAVORITERECIPESTATE)
-                size = changeSize(States.FAVORITERECIPESTATE)
-                title = changeTitle(States.FAVORITERECIPESTATE)
-                setCurrentState(States.FAVORITERECIPESTATE)
-                setLocationRelativeTo(null)
-            }
-            States.NEWPCLISTSTATE -> {
-                showPanel(NewPosNegListPane, States.NEWPCLISTSTATE)
-                size = changeSize(States.NEWPCLISTSTATE)
-                title = changeTitle(States.NEWPCLISTSTATE)
-                setCurrentState(States.NEWPCLISTSTATE)
-                setLocationRelativeTo(null)
-            }
-            States.NEWTODOLISTSTATE -> {
-                showPanel(NewToDoListPane, States.NEWTODOLISTSTATE)
-                size = changeSize(States.NEWTODOLISTSTATE)
-                title = changeTitle(States.NEWTODOLISTSTATE)
-                setCurrentState(States.NEWTODOLISTSTATE)
-                setLocationRelativeTo(null)
-            }
-            States.SAVEDLISTSTATE -> {
-                showPanel(SavListPane, States.SAVEDLISTSTATE)
-                size = changeSize(States.SAVEDLISTSTATE)
-                title = changeTitle(States.SAVEDLISTSTATE)
-                setCurrentState(States.SAVEDLISTSTATE)
-                setLocationRelativeTo(null)
-            }
+            States.MENUSTATE -> setPanelInfo(MenuPane, panel)
+            States.NEWRECIPESTATE -> setPanelInfo(NewRecPane, panel)
+            States.SAVEDRECIPESTATE -> setPanelInfo(SavRecPane, panel)
+            States.FAVORITERECIPESTATE -> setPanelInfo(FavRecPane, panel)
+            States.NEWPCLISTSTATE -> setPanelInfo(NewPosNegListPane, panel)
+            States.NEWTODOLISTSTATE -> setPanelInfo(NewToDoListPane, panel)
+            States.SAVEDLISTSTATE -> setPanelInfo(SavListPane, panel)
+            States.SAVEDDESSERTRECIPESTATE -> setPanelInfo(SavDesRecPan, panel)
+            States.SAVEDEXTRARECIPESTATE -> setPanelInfo(SavExtRecPan, panel)
+            States.SAVEDMEATRECIPESTATE -> setPanelInfo(SavMeaRecPan, panel)
         }
     }
 
@@ -203,41 +188,14 @@ class WindowDisplay : JFrame() {
             // Settings
         jmiSettings = JMenuItem("Change save location"); jmSettings.add(jmiSettings); jmiSettings.addActionListener{ val csd = ChangeSaveDirectory(); csd.setLocationRelativeTo(this) }
         jmiSettings = JMenuItem("Go back to main menu"); jmSettings.add(jmiSettings); jmiSettings.addActionListener{ switchPanels(States.MENUSTATE) }
+        jmiDebug = JMenuItem("Open debug window"); jmSettings.add(jmiDebug); jmiDebug.addActionListener{  }
             // Recipes
         jmiNewRec = JMenuItem("Create new recipe"); jmRecipes.add(jmiNewRec); jmiNewRec.addActionListener{ switchPanels(States.NEWRECIPESTATE) }
-        /*jmiDesRec = JMenu("Desserts"); jmRecipes.add(jmiDesRec); jmiDesRec.addActionListener{  }
-        jmiExtraRec = JMenu("Extras"); jmRecipes.add(jmiExtraRec); jmiExtraRec.addActionListener{  }
-        jmiMeatRec = JMenu("Meats"); jmRecipes.add(jmiMeatRec); jmiMeatRec.addActionListener{  }*/
-        jmiSavRec = JMenuItem("View all saved recipes"); jmRecipes.add(jmiSavRec); jmiSavRec.addActionListener { switchPanels(States.SAVEDRECIPESTATE) }
+        jmiSavRec = JMenu("View all saved recipes"); jmRecipes.add(jmiSavRec); jmiSavRec.addActionListener {  }
+        jmiDesRec = JMenuItem("Desserts"); jmiSavRec.add(jmiDesRec); jmiDesRec.addActionListener{ switchPanels(States.SAVEDDESSERTRECIPESTATE); SavDesRecPan.loadRecipes() }
+        jmiExtraRec = JMenuItem("Extras"); jmiSavRec.add(jmiExtraRec); jmiExtraRec.addActionListener{ switchPanels(States.SAVEDEXTRARECIPESTATE); SavExtRecPan.loadRecipes() }
+        jmiMeatRec = JMenuItem("Meats"); jmiSavRec.add(jmiMeatRec); jmiMeatRec.addActionListener{ switchPanels(States.SAVEDMEATRECIPESTATE); SavMeaRecPan.loadRecipes() }
         jmiFavRec = JMenuItem("View all favorite recipes"); jmRecipes.add(jmiFavRec); jmiFavRec.addActionListener{ switchPanels(States.FAVORITERECIPESTATE) }
-                // Sub categories
-                    // Desserts
-        /*jmiSubCatRec = JMenuItem(subCatDesserts[0]) ; jmiDesRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
-        jmiSubCatRec = JMenuItem(subCatDesserts[1]) ; jmiDesRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
-        jmiSubCatRec = JMenuItem(subCatDesserts[2]) ; jmiDesRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
-        jmiSubCatRec = JMenuItem(subCatDesserts[3]) ; jmiDesRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
-        jmiSubCatRec = JMenuItem(subCatDesserts[4]) ; jmiDesRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
-        jmiSubCatRec = JMenuItem(subCatDesserts[5]) ; jmiDesRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
-        jmiSubCatRec = JMenuItem(subCatDesserts[6]) ; jmiDesRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
-        jmiSubCatRec = JMenuItem(subCatDesserts[7]) ; jmiDesRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
-        jmiSubCatRec = JMenuItem(subCatDesserts[8]) ; jmiDesRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
-        jmiSubCatRec = JMenuItem(subCatDesserts[9]) ; jmiDesRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
-        jmiSubCatRec = JMenuItem(subCatDesserts[10]) ; jmiDesRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
-        jmiSubCatRec = JMenuItem(subCatDesserts[11]) ; jmiDesRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
-        jmiSubCatRec = JMenuItem(subCatDesserts[12]) ; jmiDesRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
-                    // Extras
-        jmiSubCatRec = JMenuItem(subCatExtras[0]) ; jmiExtraRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
-        jmiSubCatRec = JMenuItem(subCatExtras[1]) ; jmiExtraRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
-        jmiSubCatRec = JMenuItem(subCatExtras[2]) ; jmiExtraRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
-        jmiSubCatRec = JMenuItem(subCatExtras[3]) ; jmiExtraRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
-        jmiSubCatRec = JMenuItem(subCatExtras[4]) ; jmiExtraRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
-                    // Meats
-        jmiSubCatRec = JMenuItem(subCatMeats[0]) ; jmiMeatRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
-        jmiSubCatRec = JMenuItem(subCatMeats[1]) ; jmiMeatRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
-        jmiSubCatRec = JMenuItem(subCatMeats[2]) ; jmiMeatRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
-        jmiSubCatRec = JMenuItem(subCatMeats[3]) ; jmiMeatRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
-        jmiSubCatRec = JMenuItem(subCatMeats[4]) ; jmiMeatRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }
-        jmiSubCatRec = JMenuItem(subCatMeats[5]) ; jmiMeatRec.add(jmiSubCatRec); jmiSubCatRec.addActionListener{  }*/
     }
 
     private fun changeTitle(panel: Int) : String {
@@ -249,6 +207,9 @@ class WindowDisplay : JFrame() {
             States.NEWPCLISTSTATE -> "$TITLE - Create New Pros/Cons List"
             States.SAVEDLISTSTATE -> "$TITLE - View Saved Lists"
             States.NEWTODOLISTSTATE -> "$TITLE - Create New ToDo List"
+            States.SAVEDDESSERTRECIPESTATE -> "$TITLE - View Saved Dessert Recipes"
+            States.SAVEDEXTRARECIPESTATE -> "$TITLE - View Saved Extra Recipes"
+            States.SAVEDMEATRECIPESTATE -> "$TITLE - View Saved Meat Recipes"
             else -> TITLE
         }
     }
@@ -256,12 +217,15 @@ class WindowDisplay : JFrame() {
     private fun changeSize(panel: Int) : Dimension {
         return when (panel) {
             States.MENUSTATE -> Dimension(backgroundImage.width, backgroundImage.height)
-            States.NEWRECIPESTATE -> Dimension(1025, 975)
-            States.SAVEDRECIPESTATE -> Dimension(600, 600)
+            States.NEWRECIPESTATE -> Dimension(1060, 975)
+            States.SAVEDRECIPESTATE -> Dimension(1020, 600)
             States.FAVORITERECIPESTATE -> Dimension(600, 600)
             States.NEWPCLISTSTATE -> Dimension(800, 780)
-            States.SAVEDLISTSTATE -> Dimension(400, 640)
+            States.SAVEDLISTSTATE -> Dimension(600, 640)
             States.NEWTODOLISTSTATE -> Dimension(400, 750)
+            States.SAVEDDESSERTRECIPESTATE -> Dimension(600, 740)
+            States.SAVEDEXTRARECIPESTATE -> Dimension(600, 740)
+            States.SAVEDMEATRECIPESTATE -> Dimension(600, 740)
             else -> Dimension(backgroundImage.width, backgroundImage.height)
         }
     }
@@ -274,6 +238,9 @@ class WindowDisplay : JFrame() {
         NewPosNegListPane.isVisible = false
         SavListPane.isVisible = false
         NewToDoListPane.isVisible = false
+        SavDesRecPan.isVisible = false
+        SavExtRecPan.isVisible = false
+        SavMeaRecPan.isVisible = false
         cl.show(mainPane, panels[name])
         panel.isVisible = true
     }

@@ -10,6 +10,7 @@ class Recipe : Serializable {
     lateinit var subCategory: String
     lateinit var instructions: String
     lateinit var ingredients: MutableList<String>
+    lateinit var description: String
 
     // Ints
     var temperature: Int = 0
@@ -29,6 +30,7 @@ class Recipe : Serializable {
             "Sub Category:\n $subCategory \n" +
             "Instructions:\n $instructions \n" +
             "Ingredients:\n $ingredients \n" +
+            "Description:\n $description \n" +
             "Temperature:\n $temperature \n" +
             "Converted Temperature:\n $convTemperature \n" +
             "Egg Free?:\n $egg \n" +

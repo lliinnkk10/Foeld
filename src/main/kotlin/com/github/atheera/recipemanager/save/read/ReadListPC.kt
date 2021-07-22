@@ -16,22 +16,23 @@ class ReadListPC(fileName: String) {
     private val file = listPath.plus("${listCategories[0]}/$fileName")
 
     init {
-
         try {
-
             val reader = FileReader(file)
             println("File loaded at: $file")
+            dw.add("File loaded at: $file")
             val obj: JsonObject = parser.parse(reader) as JsonObject
             parseListObject(obj)
             list.toFormat()
         } catch(e: ParseException) {
+            dw.exc(e)
             e.printStackTrace()
         } catch(e: FileNotFoundException) {
+            dw.exc(e)
             e.printStackTrace()
         } catch(e: IOException) {
+            dw.exc(e)
             e.printStackTrace()
         }
-
     }
 
     private fun parseListObject(file: JsonObject) {

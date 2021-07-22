@@ -15,7 +15,7 @@ class SavedPCList(title: String, posList: MutableList<String>, negList: MutableL
     init {
         iconImage = imageIcon
         this.title = title
-        contentPane.htaTitle.text = title
+        contentPane.htfTitle.text = title
         defaultCloseOperation = DISPOSE_ON_CLOSE
         size = Dimension(800, 780)
         isVisible = true

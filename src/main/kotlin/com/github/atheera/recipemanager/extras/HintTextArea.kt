@@ -17,11 +17,7 @@ class HintTextArea(hint: String) : JTextArea() {
         foreground = Color.GRAY
         addFocusListener(object : FocusAdapter() {
             override fun focusGained(e: FocusEvent) {
-                text = if (text == hint) {
-                    ""
-                } else {
-                    text
-                }
+                text = if (text == hint) "" else text
                 font = gainFont
             }
 

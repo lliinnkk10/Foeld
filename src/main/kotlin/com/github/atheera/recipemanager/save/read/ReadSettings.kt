@@ -1,5 +1,6 @@
 package com.github.atheera.recipemanager.save.read
 
+import com.github.atheera.recipemanager.dw
 import com.github.atheera.recipemanager.path
 import com.github.atheera.recipemanager.save.objects.Settings
 import com.google.gson.JsonObject
@@ -19,13 +20,17 @@ class ReadSettings(saveLocation: String) {
         try {
             val reader = FileReader(saveLocation)
             println("File loaded at: $saveLocation")
+            dw.add("File loaded at: $saveLocation")
             val obj: JsonObject = parser.parse(reader) as JsonObject
             parseSettingsObjects(obj)
         } catch (e: ParseException) {
+            dw.exc(e)
             e.printStackTrace()
         } catch(e: FileNotFoundException) {
+            dw.exc(e)
             e.printStackTrace()
         } catch(e: IOException) {
+            dw.exc(e)
             e.printStackTrace()
         }
 

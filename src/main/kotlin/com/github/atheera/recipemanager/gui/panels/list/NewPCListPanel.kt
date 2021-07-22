@@ -27,8 +27,8 @@ class NewPCListPanel : JPanel(MigLayout("align center")), KeyListener {
     private var negButton = JButton("Add to cons side")
 
     private var htaPane = JPanel(MigLayout("align center", "[]10[]10[]", ""))
-    var htaTitle = HintTextField("Enter the list title here")
-    private var htaArg = HintTextField("Enter the argument here")
+    var htfTitle = HintTextField("Enter the list title here")
+    private var htfArg = HintTextField("Enter the argument here")
     var saveBtn = JButton("Press me to save the list to: $listPath/${listCategories[0]}")
     private var jlDesc = JLabel("NOTE: pressing enter or shift+enter adds to pros or cons respectively")
     private var jlPos = JLabel("Pros:")
@@ -47,8 +47,8 @@ class NewPCListPanel : JPanel(MigLayout("align center")), KeyListener {
         border = TitledBorder(EtchedBorder(), "Here you can make a positive and negative arguments for a subject")
 
         // Functions
-        htaTitle.minimumSize = Dimension(250, 25)
-        htaArg.minimumSize = Dimension(350, 25)
+        htfTitle.minimumSize = Dimension(250, 25)
+        htfArg.minimumSize = Dimension(350, 25)
         saveBtn.minimumSize = Dimension(350, 40)
             // Positive
         posPane.minimumSize = dim
@@ -67,7 +67,7 @@ class NewPCListPanel : JPanel(MigLayout("align center")), KeyListener {
         jlNeg.font = fontB
         jlPos.font = fontB
 
-        htaArg.addKeyListener(this)
+        htfArg.addKeyListener(this)
 
         posButton.addActionListener {
             addToList(true)
@@ -76,19 +76,19 @@ class NewPCListPanel : JPanel(MigLayout("align center")), KeyListener {
             addToList(false)
         }
         saveBtn.addActionListener {
-            if((htaTitle.text.isEmpty() || htaTitle.text == "Enter the list title here")|| posList.isEmpty() || negList.isEmpty())
+            if((htfTitle.text.isEmpty() || htfTitle.text == "Enter the list title here") || posList.isEmpty() || negList.isEmpty())
                 JOptionPane.showMessageDialog(this, "You need to enter information to save first!")
             else {
-                WriteListPC(listCategories[0], htaTitle.text, posList, negList)
+                WriteListPC(listCategories[0], htfTitle.text, posList, negList)
                 JOptionPane.showMessageDialog(this, "Successfully saved list to: $listPath/${listCategories[0]}")
                 clearInfo()
             }
         }
 
         // Add to panel
-        add(htaTitle, "align center, wrap")
+        add(htfTitle, "align center, wrap")
         htaPane.add(posButton, "align center")
-        htaPane.add(htaArg, "align center")
+        htaPane.add(htfArg, "align center")
         htaPane.add(negButton, "align center, wrap")
         htaPane.add(jlDesc, "align center, span 3")
         add(htaPane, "align center, wrap")
@@ -107,8 +107,8 @@ class NewPCListPanel : JPanel(MigLayout("align center")), KeyListener {
     }
 
     private fun clearInfo() {
-        htaArg.text = ""
-        htaTitle.text = ""
+        htfArg.text = ""
+        htfTitle.text = ""
 
         posPane.removeAll()
         negPane.removeAll()
@@ -120,17 +120,17 @@ class NewPCListPanel : JPanel(MigLayout("align center")), KeyListener {
 
     private fun addToList(isPos: Boolean) {
 
-        if(htaArg.text.isEmpty()) {
+        if(htfArg.text.isEmpty()) {
             JOptionPane.showMessageDialog(this, "You need to enter an argument!")
         }
         if(isPos) {
-            val argCard = createCard(htaArg.text, posPane)
+            val argCard = createCard(htfArg.text, posPane)
             posPane.add(argCard, "wrap")
         } else {
-            val argCard = createCard(htaArg.text, negPane)
+            val argCard = createCard(htfArg.text, negPane)
             negPane.add(argCard, "wrap")
         }
-        htaArg.text = ""
+        htfArg.text = ""
 
     }
 
@@ -159,7 +159,7 @@ class NewPCListPanel : JPanel(MigLayout("align center")), KeyListener {
         jp.maximumSize = Dimension( 340, 40)
 
         jbDelete.addActionListener {
-            htaArg.text = ""
+            htfArg.text = ""
             removePane.remove(jp)
             updateUI()
             when (removePane) {

@@ -16,26 +16,29 @@ class ReadListTD(fileName: String) {
     private val file = listPath.plus("${listCategories[1]}/$fileName")
 
     init {
-
         try {
             val reader = FileReader(file)
             println("File loaded at: $file")
+            dw.add("File loaded at: $file")
             val obj: JsonObject = parser.parse(reader) as JsonObject
             parseListObject(obj)
             list.toFormat()
         } catch(e: ParseException) {
+            dw.exc(e)
             e.printStackTrace()
         } catch(e: FileNotFoundException) {
+            dw.exc(e)
             e.printStackTrace()
         } catch(e: IOException) {
+            dw.exc(e)
             e.printStackTrace()
         }
-
     }
 
     private fun parseListObject(file: JsonObject) {
 
         listTD = mutableListOf()
+        listTDChecked = mutableListOf()
 
         val title = file.get("title").asString
         list.title = title
@@ -45,6 +48,12 @@ class ReadListTD(fileName: String) {
         for(i in 0 until listToDo.size()) {
             listTD.add(removeFirstAndLast(listToDo[i].toString()))
             list.list.add(removeFirstAndLast(listToDo[i].toString()))
+        }
+
+        val listChecked = file.get("checked").asJsonArray
+        for(i in 0 until listChecked.size()) {
+            listTDChecked.add(removeFirstAndLast(listChecked[i].toString()))
+            list.checked.add(removeFirstAndLast(listChecked[i].toString()))
         }
 
     }
